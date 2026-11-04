@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8f5ef">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="思い出ノート">
+  <meta name="referrer" content="no-referrer">
+  <title>思い出ノート</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="app-header"><span>思い出ノート</span><span id="mode-label"></span></header>
+  <p id="notice" role="status" aria-live="polite" hidden></p>
+  <main id="main" tabindex="-1" aria-label="思い出ノートの画面"></main>
+  <nav class="tabs" aria-label="画面を切り替える">
+    <button id="tab-today" type="button">今日</button>
+    <button id="tab-list" type="button">一覧</button>
+    <button id="tab-settings" type="button">設定</button>
+  </nav>
+  <noscript>JavaScript を有効にして開いてください。</noscript>
+  <script type="module" src="./js/main.mjs"></script>
+</body>
+</html>
