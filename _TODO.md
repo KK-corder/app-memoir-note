@@ -7,9 +7,15 @@
 
 ## 🔴 次にやる
 
-- [ ] 要件を決める: 誰が・何のために使うか、最小構成で何ができれば完成かを README に書く
+- [x] ~~要件を決める~~ → 2026-11-04 本人が要件 §5・§3 に回答（毎日 1 件・写真は手で選んだもの優先＋自動・宿題は出さない・追記は「日付 追記: 〜」・21 時のリマインダー・Google ドライブ）
+- [ ] `/build` で初版を Codex に作らせてレビューする（工場）: `docs/briefs/20261104-01-first-version.md`
+- [ ] （本人）依頼書 `~/Dev/_system/docs/20261104-思い出ノート-書き出しと取り込み要件.md` を WorkSpace の Claude に渡す（memoir.json の書き出し・追記と写真の取り込み・21 時のリマインダー）。アプリはそれを待たずに作れる
 
 ## 🟡 そのあと
+
+- [ ] （本人に確かめてから Claude）GitHub に `app-memoir-note` を作って Pages で公開する
+- [ ] （本人）Google Cloud の論文リーダーと同じ OAuth のクライアントに、承認済みのリダイレクト URI `https://kk-corder.github.io/app-memoir-note/` と `…/index.html` を足す（公開したら）
+- [ ] （本人・公開と WorkSpace 側ができたら）21 時の通知から開く → 1 件書き足して写真を 1 枚足す → 翌日までに WorkSpace のノートの末尾と `~/Pictures/思い出/` に入るか見る。通ったら WorkSpace に ntfy を止めてもらう（要件 §6）
 
 ## 🟢 いつか
 

@@ -14,3 +14,9 @@
 ```
 
 ---
+
+## 2026-11-04 置き場・ログイン・追記の流れ
+- 決定: 形は PaperReader と同じ PWA（GitHub Pages・Google ドライブで受け渡し・サーバーなし）。Drive の置き場はマイドライブの `思い出ノート/_app/`（Mac が `memoir.json` と `photos/` を書き、アプリは `inbox/` に `append_log.json` と写真を作る）。OAuth のクライアントは PaperReader のものを使い回し、戻り先の URL だけ足す。追記は端末に未送信として残してから Drive に送る（PaperReader の comments と同じ流れ）。写真は端末に残さず、縮めてすぐ送る。
+- 理由: 本人「Google ドライブでよい」（2026-11-04）。PaperReader で `drive.file` のまま Mac のフォルダに書けると実機で確かめ済み（10/29）。クライアントを分けると、同意画面とスコープの設定を本人がもう一度やることになる。写真は大きく、`localStorage` に入らない。
+- 却下した案: ntfy の続投（本人「使いにくい」）。iCloud Drive（PWA から読み書きできない）。
+- 決めた人: ユーザー（Drive・頻度・写真・追記の形・21 時）／Claude（置き場の名前・クライアントの使い回し・未送信の流れ）
