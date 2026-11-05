@@ -5,9 +5,9 @@ iPhone で過去の思い出ノートを毎日 1 件見返して書き足す PWA
 | 項目 | 内容 |
 |---|---|
 | カテゴリ | アプリ |
-| 状態 | 試作中 |
+| 状態 | 公開済み（iPhone での確認待ち） |
 | 作る環境 | Mac（Dev） |
-| 公開 | 非公開 |
+| 公開 | https://kk-corder.github.io/app-memoir-note/ （リポジトリ `KK-corder/app-memoir-note` は公開。中身はコードと作り物のデモだけ） |
 
 <!-- 型の決まりは ~/Dev/_system/rules/repo_format.md §4。見出しの名前と順番を変えない -->
 

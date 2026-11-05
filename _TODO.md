@@ -1,6 +1,6 @@
 # MemoirNote TODO
 
-最終更新: 2026-11-04
+最終更新: 2026-11-05
 
 書き方: 1項目＝1つの具体的な行動（何を・どこで・どこまでやれば完了か）。期限があれば日付を入れる。
 完了したら削除せず `- [x] ~~項目~~ → 結果` にする。Codex に委任する項目には、ブリーフのパスを添える。
@@ -9,12 +9,12 @@
 
 - [x] ~~要件を決める~~ → 2026-11-04 本人が要件 §5・§3 に回答（毎日 1 件・写真は手で選んだもの優先＋自動・宿題は出さない・追記は「日付 追記: 〜」・21 時のリマインダー・Google ドライブ）
 - [x] ~~`/build` で初版を Codex に作らせてレビューする（工場）: `docs/briefs/20261104-01-first-version.md`~~ → 2026-11-04 修正なしで通過（テスト 48 件。画面なしの Chrome でデモの 390×844・844×390・ダークモードを確認: 開く前は本文と写真なし・開いた状態が残る・追記が再読み込み後も残る・2001 字は不可・写真の追加と全画面での送り・一覧の並びと検索と戻る位置・未送信を残す確認・横スクロールなし・押すところ 44px 以上・入力欄 16px 以上・エラーなし）。報告 `docs/reports/20261104-first-version.md`
-- [ ] （本人）依頼書 `~/Dev/_system/docs/20261104-思い出ノート-書き出しと取り込み要件.md` を WorkSpace の Claude に渡す（memoir.json の書き出し・追記と写真の取り込み・21 時のリマインダー）。アプリはそれを待たずに作れる
+- [x] ~~（本人）依頼書を WorkSpace の Claude に渡す~~ → 2026-11-05 WorkSpace 側で完了。Claude が確認: memoir.json にノート 94 件（`_` 始まりを除いた全部）・today あり・アプリの読み込みで落ちない。写真 103 枚は全部 Drive に実物があり 1600px 以下の JPEG（`photos/<ノート名>/` に分かれている。アプリは drive_id で読むので問題なし）。launchd は書き出し 20:50・取り込み 30 分ごと・知らせ 21:00。日付が空のノートが 1 件（一覧の最後に出る）・11/4 の today のノートは写真 0 枚
 
 ## 🟡 そのあと
 
-- [ ] （本人に確かめてから Claude）GitHub に `app-memoir-note` を作って Pages で公開する
-- [ ] （本人）Google Cloud の論文リーダーと同じ OAuth のクライアントに、承認済みのリダイレクト URI `https://kk-corder.github.io/app-memoir-note/` と `…/index.html` を足す（公開したら）
+- [x] ~~（本人に確かめてから Claude）GitHub に `app-memoir-note` を作って Pages で公開する~~ → 2026-11-05 本人「いいよ」。公開して Pages のビルドが終わり、公開 URL でデモが動くのを画面なしの Chrome で確認
+- [ ] （本人）Google Cloud の論文リーダーと同じ OAuth のクライアントに、承認済みのリダイレクト URI `https://kk-corder.github.io/app-memoir-note/` と `https://kk-corder.github.io/app-memoir-note/index.html` を足す（JavaScript 生成元の `https://kk-corder.github.io` は論文リーダーで登録済み）
 - [ ] （本人・公開と WorkSpace 側ができたら）21 時の通知から開く → 1 件書き足して写真を 1 枚足す → 翌日までに WorkSpace のノートの末尾と `~/Pictures/思い出/` に入るか見る。通ったら WorkSpace に ntfy を止めてもらう（要件 §6）
 
 ## 🟢 いつか
