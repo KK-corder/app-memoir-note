@@ -14,9 +14,13 @@
 ## 🟡 そのあと
 
 - [x] ~~（本人に確かめてから Claude）GitHub に `app-memoir-note` を作って Pages で公開する~~ → 2026-11-05 本人「いいよ」。公開して Pages のビルドが終わり、公開 URL でデモが動くのを画面なしの Chrome で確認
-- [ ] （本人）Google Cloud の論文リーダーと同じ OAuth のクライアントに、承認済みのリダイレクト URI `https://kk-corder.github.io/app-memoir-note/` と `https://kk-corder.github.io/app-memoir-note/index.html` を足す（JavaScript 生成元の `https://kk-corder.github.io` は論文リーダーで登録済み）
-- [ ] （本人・公開と WorkSpace 側ができたら）21 時の通知から開く → 1 件書き足して写真を 1 枚足す → 翌日までに WorkSpace のノートの末尾と `~/Pictures/思い出/` に入るか見る。通ったら WorkSpace に ntfy を止めてもらう（要件 §6）
+- [x] ~~（本人）Google Cloud の OAuth のクライアントにリダイレクト URI を足す~~ → 2026-11-05 ログインできた
+- [x] ~~（本人）iPhone で 1 件書き足して写真を 1 枚足し、WorkSpace に入るか見る~~ → 2026-11-05 13:25 に書いた文と写真が 15:36 にノートの末尾と `~/Pictures/思い出/` に入った（Claude が確認）。ただし Drive が写真をまだ Mac に降ろしていない間、取り込みが 4 回落ち、文も一緒に 2 時間止まった
+- [ ] （本人）WorkSpace の Claude に「`memoir_app.py` の apply で、Drive から降りていない写真（`OSError: Resource deadlock avoided`）は飛ばして次の回に回し、ほかの文の取り込みは止めないようにして」と頼む（`~/Library/Logs/memoir-app.err.log` 11/5 13:30〜15:06）
+- [ ] （本人）通知から開く流れを数日使ってみて、よければ WorkSpace に ntfy を止めてもらう（要件 §6）
 
 ## 🟢 いつか
+
+- [ ] 次に開発するとき: iPhone のアプリから新しい思い出（題・日付・場所・一緒にいた人・本文・写真）を作れるようにする。追記と同じく inbox に書き、Mac が `04_other/旅行とライブ/YYYY-MM-DD_題.md` を作る形で、要件とブリーフを書く（2026-11-05 本人「次開発するときに追加する機能にしよう」）
 
 ## 保留・判断待ち
