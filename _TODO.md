@@ -17,8 +17,7 @@
 - [x] ~~（本人）Google Cloud の OAuth のクライアントにリダイレクト URI を足す~~ → 2026-11-05 ログインできた
 - [x] ~~（本人）iPhone で 1 件書き足して写真を 1 枚足し、WorkSpace に入るか見る~~ → 2026-11-05 13:25 に書いた文と写真が 15:36 にノートの末尾と `~/Pictures/思い出/` に入った（Claude が確認）。ただし Drive が写真をまだ Mac に降ろしていない間、取り込みが 4 回落ち、文も一緒に 2 時間止まった
 - [x] ~~（本人）WorkSpace の Claude に「`memoir_app.py` の apply で、Drive から降りていない写真（`OSError: Resource deadlock avoided`）は飛ばして次の回に回し、ほかの文の取り込みは止めないようにして」と頼む（`~/Library/Logs/memoir-app.err.log` 11/5 13:30〜15:06）~~ → 2026-11-06 WorkSpace `fa277e5` で直った。Claude が仮のフォルダで確かめた: 写真が読めない回は写真だけ「wait」で残り、同じ回の文は取り込まれる。次の回に写真が入り、inbox から消える
-- [x] ~~（本人）通知から開く流れを数日使ってみて、よければ WorkSpace に ntfy を止めてもらう（要件 §6）~~ → 2026-11-08 本人「何日か使った感じ、もういい感じ」
-- [ ] （本人）WorkSpace の Claude に「`com.kakeru.memoir-recall`（ntfy に思い出を送る仕組み）を止めて。ntfy 本体と `phone-bridge` は残す。`system_map.md` の通知ポリシーの例外も直して」と頼む（ntfy は phone-bridge と論文リーダーの失敗通知でも使っているので、止めるのは memoir-recall だけ）
+- [x] ~~（本人）通知から開く流れを数日使ってみて、よければ WorkSpace に ntfy を止めてもらう（要件 §6）~~ → 2026-11-08 本人「何日か使った感じ、もういい感じ」（ntfy の扱いは WorkSpace で考える。本人 11/8「Dev では考えなくていい」）
 
 ## 🟢 いつか
 
