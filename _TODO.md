@@ -11,9 +11,9 @@
 - [x] ~~`/build` で初版を Codex に作らせてレビューする（工場）: `docs/briefs/20261104-01-first-version.md`~~ → 2026-11-04 修正なしで通過（テスト 48 件。画面なしの Chrome でデモの 390×844・844×390・ダークモードを確認: 開く前は本文と写真なし・開いた状態が残る・追記が再読み込み後も残る・2001 字は不可・写真の追加と全画面での送り・一覧の並びと検索と戻る位置・未送信を残す確認・横スクロールなし・押すところ 44px 以上・入力欄 16px 以上・エラーなし）。報告 `docs/reports/20261104-first-version.md`
 - [x] ~~（本人）依頼書を WorkSpace の Claude に渡す~~ → 2026-11-05 WorkSpace 側で完了。Claude が確認: memoir.json にノート 94 件（`_` 始まりを除いた全部）・today あり・アプリの読み込みで落ちない。写真 103 枚は全部 Drive に実物があり 1600px 以下の JPEG（`photos/<ノート名>/` に分かれている。アプリは drive_id で読むので問題なし）。launchd は書き出し 20:50・取り込み 30 分ごと・知らせ 21:00。日付が空のノートが 1 件（一覧の最後に出る）・11/4 の today のノートは写真 0 枚
 
-- [ ] （Claude）WorkSpace の `create` の取り込みを確かめる: 依頼書 `~/Dev/_system/docs/20261108-思い出ノート-新しい思い出の取り込み要件.md` は 11/8 に本人が渡して WorkSpace で実行中。本人が「できた」と言ったら、依頼書 §4 の 2 点（仮の inbox で `create` → `photo` → `text` を流した結果・`rejected` の言い方）と `memoir_app.py` の `apply_log` を読んで確かめる（アプリの公開はこれが済んでから）
+- [x] ~~（Claude）WorkSpace の `create` の取り込みを確かめる~~ → 2026-11-08 WorkSpace `00a4a68`。Claude が仮の inbox の結果（`create` → `photo` → `text` が新しいノートに入り、3 つの失敗が理由つきで `rejected` に出る）と `apply_log` を読んで確認。上書きしない・1 件ごとに保存する作り。`memoir.json` の 3 行目は終わりの空白が取れるので、候補の分け方をブリーフに足した
 - [ ] `/build` で新しい思い出を Codex に作らせてレビューする（工場）: `docs/briefs/20261108-01-new-memory.md`
-- [ ] （Claude）上の 2 つが済んだら公開し、本人が iPhone で 1 件作って WorkSpace の `04_other/旅行とライブ/` にできるか確かめる
+- [ ] （Claude）`/build` が通ったら公開し、本人が iPhone で 1 件作って WorkSpace の `04_other/旅行とライブ/` にできるか確かめる
 
 ## 🟡 そのあと
 
