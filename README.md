@@ -1,4 +1,4 @@
-# MemoirNote
+# 思い出ノート（MemoirNote）
 
 iPhone で過去の思い出ノートを毎日 1 件見返して書き足す PWA
 
