@@ -5,3 +5,4 @@ import './entries.test.mjs';
 import './photos.test.mjs';
 import './app.test.mjs';
 import './pwa.test.mjs';
+import './new-memory.test.mjs';

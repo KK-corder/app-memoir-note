@@ -1,8 +1,8 @@
-const CACHE = 'memoir-note-shell-v1';
+const CACHE = 'memoir-note-shell-v2';
 const ROOT = new URL('./', self.location.href);
 const SHELL = [
   'index.html', 'styles.css', 'config.js', 'manifest.webmanifest',
-  'js/main.mjs', 'js/app.mjs', 'js/core.mjs', 'js/login.mjs', 'js/storage.mjs', 'js/drive.mjs', 'js/entries.mjs', 'js/photos.mjs',
+  'js/main.mjs', 'js/app.mjs', 'js/core.mjs', 'js/login.mjs', 'js/storage.mjs', 'js/drive.mjs', 'js/entries.mjs', 'js/photos.mjs', 'js/compose-memory.mjs',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
   'demo/memoir.json', 'demo/photos/scene-1.svg', 'demo/photos/scene-2.svg', 'demo/photos/scene-3.svg', 'demo/photos/scene-4.svg', 'demo/photos/scene-5.svg',
 ].map(path => new URL(path, ROOT).href);

@@ -10,7 +10,7 @@ export function createStore(storage, onError = () => {}, defaultPath = DEFAULT_P
   const state = {
     session: saved.session || null, pendingLogin: saved.pendingLogin || null,
     settings: { method: saved.settings?.method === 'popup' ? 'popup' : 'redirect', path: typeof saved.settings?.path === 'string' && saved.settings.path.trim() ? saved.settings.path : defaultPath },
-    folders: object(saved.folders), opened: object(saved.opened),
+    folders: object(saved.folders), opened: object(saved.opened), drafts: object(saved.drafts),
     entries: Array.isArray(saved.entries) ? saved.entries.filter(row => row && typeof row.scope === 'string' && row.event?.id) : [],
   };
   function save() {

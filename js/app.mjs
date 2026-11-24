@@ -1,9 +1,10 @@
-import { DEFAULT_PATH, normalizeMemoir, sortedNotes, openedKey, staleMessage, textLength, errorMessage } from './core.mjs';
+import { DEFAULT_PATH, normalizeMemoir, sortedNotes, openedKey, staleMessage, textLength, errorMessage, memoryCandidates, pendingNotes, creationMessage } from './core.mjs';
 import { createStore } from './storage.mjs';
 import { consumeRedirect, validSession, redirectURL, loadGIS, DRIVE_SCOPE } from './login.mjs';
 import { Drive } from './drive.mjs';
 import { createEntries } from './entries.mjs';
 import { shrinkPhoto, createGallery } from './photos.mjs';
+import { composeMemory } from './compose-memory.mjs';
 
 export async function startApp({ clientId = '', defaultPath = DEFAULT_PATH, window = globalThis.window, document = globalThis.document,
   fetcher = globalThis.fetch, now = Date.now, urls = globalThis.URL, resize = shrinkPhoto, registerWorker = true } = {}) {
@@ -20,7 +21,8 @@ export async function startApp({ clientId = '', defaultPath = DEFAULT_PATH, wind
   if (redirect.error) announce(redirect.error);
   const drive = new Drive(store, () => { store.state.session = null; store.save(); announce('もう一度ログインしてください。'); }, fetcher);
   let refreshUpdates = () => {}, data = normalizeMemoir(null), view = 'today', selected = null, query = '', listPosition = 0;
-  let disposeView = () => {}, loadVersion = 0, busyPhotos = false, disposed = false, popupClient = null, photoInput = null;
+  let disposeView = () => {}, loadVersion = 0, busyPhotos = false, disposed = false, popupClient = null;
+  let busyCreate = false, candidates = memoryCandidates([]);
   const entries = createEntries(store, drive, { demo, now, onChange: () => refreshUpdates() });
   $('mode-label').textContent = demo ? 'デモ' : '';
   const isLoggedIn = () => validSession(store.state.session, now());
@@ -28,7 +30,7 @@ export async function startApp({ clientId = '', defaultPath = DEFAULT_PATH, wind
 
   async function load() {
     const version = ++loadVersion;
-    if (!demo && !isLoggedIn()) { data = normalizeMemoir(null); render(); return; }
+    if (!demo && !isLoggedIn()) { data = normalizeMemoir(null); candidates = memoryCandidates([]); render(); return; }
     try {
       let raw;
       if (demo) {
@@ -37,7 +39,7 @@ export async function startApp({ clientId = '', defaultPath = DEFAULT_PATH, wind
         raw = await response.json();
       } else raw = await drive.memoir();
       if (disposed || version !== loadVersion) return;
-      data = normalizeMemoir(raw); entries.reconcile(data.applied); render();
+      data = normalizeMemoir(raw); candidates = memoryCandidates(data.notes); entries.reconcile(data.applied, data.rejected); render();
       await entries.flush();
     } catch (error) {
       if (disposed || version !== loadVersion) return;
@@ -53,6 +55,7 @@ export async function startApp({ clientId = '', defaultPath = DEFAULT_PATH, wind
     return response.blob();
   }
   function navigate(next, note = null) {
+    if (next === 'create' && busyCreate) { announce('新しい思い出を送っています。送信が終わってから作ってください。'); return; }
     if (view === 'list') listPosition = main.scrollTop;
     view = next; selected = note; render();
     main.scrollTop = next === 'list' ? listPosition : 0;
@@ -60,13 +63,18 @@ export async function startApp({ clientId = '', defaultPath = DEFAULT_PATH, wind
   function render() {
     disposeView(); disposeView = () => {}; refreshUpdates = () => {};
     main.replaceChildren();
-    for (const tab of ['today', 'list', 'settings']) $('tab-' + tab).setAttribute('aria-current', view === tab || (view === 'note' && tab === 'list') ? 'page' : 'false');
+    for (const tab of ['today', 'list', 'settings']) $('tab-' + tab).setAttribute('aria-current', view === tab || (['note', 'create'].includes(view) && tab === 'list') ? 'page' : 'false');
     if (view === 'settings') return renderSettings();
-    if (!demo && !isLoggedIn()) {
+    if (!demo && !isLoggedIn() && !data.notes.length && !entries.creations().length && !store.state.drafts[entries.scope()]) {
       main.append(el('h1', '思い出を、ひとつずつ。'), el('p', 'Google ドライブの思い出ノートを開きます。'), button('設定でログインする', () => navigate('settings'), 'primary')); return;
     }
     if (view === 'list') return renderList();
+    if (view === 'create') {
+      disposeView = composeMemory({ document, window, main, el, button, entries, candidates, now, urls, resize, submitMemory, navigate, announce });
+      return;
+    }
     if (view === 'note') {
+      selected = pendingNotes(data.notes, entries.creations()).find(note => note.id === selected?.id) || selected;
       main.append(button('‹ 一覧へ戻る', () => navigate('list'), 'back'));
       return renderNote(selected, selected.hook);
     }
@@ -85,19 +93,42 @@ export async function startApp({ clientId = '', defaultPath = DEFAULT_PATH, wind
     }, 'primary reveal'));
   }
   function renderList() {
-    main.append(el('h1', '思い出の一覧'));
+    main.append(el('h1', '思い出の一覧'), button('＋ 新しい思い出', () => navigate('create'), 'primary'));
     const label = el('label', '思い出を検索'); label.htmlFor = 'search';
     const search = el('input'); search.id = 'search'; search.type = 'search'; search.value = query; search.placeholder = '題・場所・本文から';
     const count = el('p', '', 'muted'), list = el('div', '', 'note-list');
     function update() {
       query = search.value; list.replaceChildren();
-      const notes = sortedNotes(data.notes, query); count.textContent = `${notes.length} 件の思い出`;
+      const notes = sortedNotes(pendingNotes(data.notes, entries.creations()), query); count.textContent = `${notes.length} 件の思い出`;
       for (const note of notes) {
         const row = button('', () => navigate('note', note), 'note-row');
-        row.append(el('span', note.date, 'date'), el('strong', note.title), el('span', `写真 ${note.photos.length} 枚`, 'muted')); list.append(row);
+        row.append(el('span', note.date, 'date'), el('strong', note.title), el('span', `写真 ${note.photos.length} 枚`, 'muted'));
+        if (note.creation) row.append(el('span', creationMessage(note.creation), 'pending-memory'));
+        list.append(row);
       }
     }
-    search.addEventListener('input', update); update(); main.append(label, search, count, list);
+    search.addEventListener('input', update); refreshUpdates = update; update(); main.append(label, search, count, list);
+  }
+  async function submitMemory(draft, photos, progress) {
+    if (busyCreate) throw new Error('新しい思い出の送信が終わるまでお待ちください。');
+    const row = entries.recordCreate(draft, data.notes);
+    busyCreate = true;
+    try {
+      progress('ノートを送っています…'); await entries.flush();
+      if (row.status !== 'sent') {
+        announce(`${row.error || 'ノートは未送信で端末に残っています。'} 写真は、ノートが届いてからノートの画面で足してください`);
+        return;
+      }
+      const failures = [];
+      for (let i = 0; i < photos.length; i++) {
+        progress(`${i + 1} / ${photos.length} 枚を送っています…`);
+        try {
+          const result = await entries.photo(row.event.note_id, photos[i]);
+          if (!result.persisted) failures.push(`${i + 1} 枚目は送信済みですが、反映待ちの情報を端末に保存できませんでした。`);
+        } catch (error) { failures.push(`${i + 1} 枚目：${errorMessage(error)} ノートの画面で写真をもう一度選び直してください。`); }
+      }
+      announce(failures.length ? failures.join('\n') : 'ノートを送りました。Mac に届くのを待っています。');
+    } finally { busyCreate = false; }
   }
   function renderNote(note, hook = '') {
     if (hook) main.append(el('p', hook, 'small-hook'));
@@ -109,6 +140,27 @@ export async function startApp({ clientId = '', defaultPath = DEFAULT_PATH, wind
     function update() {
       updates.replaceChildren();
       const rows = entries.forNote(note.id), ids = new Set(rows.map(row => row.event.id));
+      const creation = rows.find(row => row.event.kind === 'create');
+      const blocked = entries.blocked(note.id);
+      submit.disabled = blocked || textLength(input.value) > 2000; input.disabled = blocked; file.disabled = blocked || busyPhotos;
+      if (creation) {
+        updates.append(el('p', creationMessage(creation), 'banner'));
+        if (creation.reason) {
+          const confirm = el('section', '', 'confirm'); confirm.hidden = true;
+          confirm.append(el('p', 'この端末の作成記録を消しますか？ Mac や Drive の記録は消しません。'),
+            button('この記録を消して一覧へ戻る', () => { if (entries.removeRejected(creation.event.id)) navigate('list'); }),
+            button('キャンセル', () => { confirm.hidden = true; }));
+          updates.append(button('本文を写す', async () => {
+            try {
+              await window.navigator.clipboard.writeText(`# ${creation.event.title}\n\n${creation.event.meta}\n\n${creation.event.body}`);
+              announce('題・日付 / 場所 / 一緒にいた人・本文を写しました。');
+            } catch { announce('本文を写せませんでした。本文を選択してコピーしてください。'); }
+          }), button('この記録を消す', () => { confirm.hidden = false; }), confirm);
+        } else {
+          updates.append(el('p', creation.status === 'sent' ? '送信済み・ノートへの反映待ち' : `未送信${creation.error ? `：${creation.error}` : ''}`, 'muted'));
+          if (blocked) updates.append(el('p', 'ノートを送ってから書き足せます'));
+        }
+      }
       for (const [id, url] of previews) if (!ids.has(id)) { urls.revokeObjectURL(url); previews.delete(id); }
       for (const row of rows.filter(row => row.event.kind === 'text')) {
         const block = el('article', '', 'append');
@@ -121,15 +173,14 @@ export async function startApp({ clientId = '', defaultPath = DEFAULT_PATH, wind
         const figure = el('figure', '', 'preview'), image = el('img'); image.src = previews.get(row.event.id); image.alt = '追加した写真';
         figure.append(image, el('figcaption', 'Mac に届くのを待っています')); updates.append(figure);
       }
-      if (rows.some(row => row.status === 'pending')) updates.append(button('もう一度送る', () => entries.flush()));
+      if (rows.some(row => row.status === 'pending' && !row.reason)) updates.append(button('もう一度送る', () => entries.flush()));
     }
-    refreshUpdates = update; update();
     const form = el('form', '', 'compose'), label = el('label', '思い出したことを書き足す'); label.htmlFor = 'append-text';
     const input = el('textarea'); input.id = 'append-text'; input.rows = 5; input.placeholder = '思い出したこと、覚えていること。';
     const length = el('p', '0 / 2000 字', 'muted'), feedback = el('p', '', 'form-message'); feedback.setAttribute('role', 'status');
     const submit = el('button', '書き足す', 'primary'); submit.type = 'submit';
     input.addEventListener('input', () => {
-      const size = textLength(input.value); length.textContent = `${size} / 2000 字`; submit.disabled = size > 2000;
+      const size = textLength(input.value); length.textContent = `${size} / 2000 字`; submit.disabled = entries.blocked(note.id) || size > 2000;
       feedback.textContent = size > 2000 ? '追記は 2000 字までです。短くしてから書き足してください。' : '';
     });
     form.addEventListener('submit', async event => {
@@ -141,11 +192,12 @@ export async function startApp({ clientId = '', defaultPath = DEFAULT_PATH, wind
     });
     form.append(label, input, length, feedback, submit); main.append(form);
     const photoLabel = el('label', '写真を足す', 'file-button'); photoLabel.htmlFor = 'photo-input';
-    const file = el('input'); file.id = 'photo-input'; file.type = 'file'; file.accept = 'image/*'; file.multiple = true; file.disabled = busyPhotos; photoInput = file;
+    const file = el('input'); file.id = 'photo-input'; file.type = 'file'; file.accept = 'image/*'; file.multiple = true; file.disabled = busyPhotos;
     const progress = el('p', '', 'muted'); progress.setAttribute('role', 'status');
     const errors = el('div', '', 'form-message'); errors.setAttribute('role', 'status');
     file.addEventListener('change', async () => {
       if (busyPhotos) return;
+      if (entries.blocked(note.id)) { announce('ノートを送ってから書き足せます'); return; }
       const files = Array.from(file.files || []); busyPhotos = true; file.disabled = true; errors.replaceChildren();
       try {
         for (let i = 0; i < files.length; i++) {
@@ -161,10 +213,11 @@ export async function startApp({ clientId = '', defaultPath = DEFAULT_PATH, wind
           }
         }
         progress.textContent = `${files.length} / ${files.length} 枚の処理が終わりました。`;
-      } finally { busyPhotos = false; file.disabled = false; file.value = ''; if (photoInput) photoInput.disabled = false; }
+      } finally { busyPhotos = false; file.disabled = entries.blocked(note.id); file.value = ''; refreshUpdates(); }
     });
     main.append(photoLabel, file, progress, errors);
-    disposeView = () => { active = false; photoInput = null; gallery.dispose(); for (const url of previews.values()) urls.revokeObjectURL(url); previews.clear(); };
+    refreshUpdates = update; update();
+    disposeView = () => { active = false; gallery.dispose(); for (const url of previews.values()) urls.revokeObjectURL(url); previews.clear(); };
   }
   async function preparePopup(loginButton) {
     if (demo || store.state.settings.method !== 'popup') return;
@@ -197,7 +250,7 @@ export async function startApp({ clientId = '', defaultPath = DEFAULT_PATH, wind
     }, 'primary'); login.disabled = demo;
     method.addEventListener('change', () => { store.state.settings.method = method.value; store.save(); render(); });
     const logout = button('ログアウト', () => {
-      store.state.session = null; store.state.pendingLogin = null; store.save(); data = normalizeMemoir(null); ++loadVersion; render();
+      store.state.session = null; store.state.pendingLogin = null; store.save(); data = normalizeMemoir(null); candidates = memoryCandidates([]); ++loadVersion; render();
     }); logout.disabled = demo;
     main.append(methodLabel, method, login, logout); void preparePopup(login);
     const pathForm = el('form', '', 'settings-group'), pathLabel = el('label', 'Drive の置き場（マイドライブから）'); pathLabel.htmlFor = 'folder-path';
@@ -205,22 +258,22 @@ export async function startApp({ clientId = '', defaultPath = DEFAULT_PATH, wind
     const save = el('button', '置き場を保存して読み直す'); save.type = 'submit'; save.disabled = demo;
     pathForm.addEventListener('submit', async event => {
       event.preventDefault();
-      if (busyPhotos) { announce('写真の送信が終わってから置き場を変更してください。'); return; }
+      if (busyPhotos || busyCreate) { announce('ノートと写真の送信が終わってから置き場を変更してください。'); return; }
       const value = path.value.split('/').map(part => part.trim()).filter(Boolean).join('/');
       if (!value) { announce('置き場の道筋を入力してください。'); return; }
       await entries.flush();
-      store.state.settings.path = value; store.save(); data = normalizeMemoir(null); await load();
+      store.state.settings.path = value; store.save(); data = normalizeMemoir(null); candidates = memoryCandidates([]); await load();
     });
     pathForm.append(pathLabel, path, save); main.append(pathForm);
     const pending = el('p'); refreshUpdates = () => {
-      pending.textContent = `未送信の追記：${entries.pendingCount()} 件（端末全体：${entries.allPendingCount()} 件）。別の置き場の未送信は、道筋を元に戻して送れます。`;
+      pending.textContent = `未送信の追記・新しい思い出：${entries.pendingCount()} 件（端末全体：${entries.allPendingCount()} 件）。別の置き場の未送信は、道筋を元に戻して送れます。`;
     }; refreshUpdates();
     main.append(pending, button('もう一度送る', () => entries.flush()));
     main.append(el('p', `いつの書き出しか：${data.generated || 'まだ読み込んでいません'}`, 'muted'), button('書き出しを読み直す', load));
     const confirm = el('section', '', 'confirm'); confirm.hidden = true;
     main.append(button('端末に覚えたものを消す', () => {
       const count = entries.allPendingCount();
-      confirm.hidden = false; confirm.replaceChildren(el('p', `未送信の追記が ${count} 件あります。フォルダ ID と開いた状態を消します。追記・写真の反映待ちと未送信は残します。`),
+      confirm.hidden = false; confirm.replaceChildren(el('p', `未送信の追記が ${count} 件あります（新しい思い出も含みます）。フォルダ ID と開いた状態を消します。追記・写真・新しい思い出の反映待ちと未送信、下書きは残します。`),
         button('未送信を残して消す', () => { store.clearRemembered(); confirm.hidden = true; announce('フォルダ ID と開いた状態を消しました。未送信は残しています。'); }),
         button('キャンセル', () => { confirm.hidden = true; }));
     }), confirm);

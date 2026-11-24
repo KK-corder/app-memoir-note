@@ -12,8 +12,8 @@
 - [x] ~~（本人）依頼書を WorkSpace の Claude に渡す~~ → 2026-11-05 WorkSpace 側で完了。Claude が確認: memoir.json にノート 94 件（`_` 始まりを除いた全部）・today あり・アプリの読み込みで落ちない。写真 103 枚は全部 Drive に実物があり 1600px 以下の JPEG（`photos/<ノート名>/` に分かれている。アプリは drive_id で読むので問題なし）。launchd は書き出し 20:50・取り込み 30 分ごと・知らせ 21:00。日付が空のノートが 1 件（一覧の最後に出る）・11/4 の today のノートは写真 0 枚
 
 - [x] ~~（Claude）WorkSpace の `create` の取り込みを確かめる~~ → 2026-11-08 WorkSpace `00a4a68`。Claude が仮の inbox の結果（`create` → `photo` → `text` が新しいノートに入り、3 つの失敗が理由つきで `rejected` に出る）と `apply_log` を読んで確認。上書きしない・1 件ごとに保存する作り。`memoir.json` の 3 行目は終わりの空白が取れるので、候補の分け方をブリーフに足した
-- [ ] `/build` で新しい思い出を Codex に作らせてレビューする（工場）: `docs/briefs/20261108-01-new-memory.md`
-- [ ] （Claude）`/build` が通ったら公開し、本人が iPhone で 1 件作って WorkSpace の `04_other/旅行とライブ/` にできるか確かめる
+- [x] ~~`/build` で新しい思い出を Codex に作らせてレビューする（工場）: `docs/briefs/20261108-01-new-memory.md`~~ → 2026-11-24 修正なしで通過（テスト 68 件。画面なしの Chrome でデモの 390×844・844×390・ダークモード: 一覧から作る画面に入る・期間で作る・人の札・再読み込みで下書きが戻る・作ると一覧に「Mac に届くのを待っています」・押すと題と 3 行目と本文・横スクロールなし・押すところ 44px 以上・入力欄 16px 以上・エラーなし）。報告 `docs/reports/20261124-1558-20261108-01-new-memory.md`
+- [ ] （Claude 済み・本人）公開した。本人が iPhone で 1 件作って WorkSpace の `04_other/旅行とライブ/` にできるか確かめる（Claude が公開し、本人が iPhone で 1 件作って WorkSpace の `04_other/旅行とライブ/` にできるか確かめる
 
 ## 🟡 そのあと
 

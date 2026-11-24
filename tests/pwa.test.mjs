@@ -23,6 +23,7 @@ test('every cached asset exists and allowlist includes app modules and demo only
   const paths = vm.runInContext('SHELL', context).map(url => new URL(url).pathname.replace('/app-memoir-note/', ''));
   for (const path of paths) assert.ok(existsSync(new URL('../' + path, import.meta.url)), path);
   assert.ok(paths.includes('demo/memoir.json')); assert.ok(paths.includes('js/app.mjs'));
+  assert.ok(paths.includes('js/compose-memory.mjs'));
   assert.ok(!paths.some(path => path.includes('tests/') || path.includes('docs/')));
 });
 test('manifest is relative, standalone, Japanese, with real 192/512 and apple icons', () => {

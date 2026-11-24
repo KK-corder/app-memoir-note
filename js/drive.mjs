@@ -87,7 +87,7 @@ export class Drive {
     if (!file.isAppAuthorized || file.appProperties?.memoirNote !== MARKER || file.capabilities?.canEdit !== true) throw new DriveError(403, WRITE_PERMISSION_MESSAGE);
     const check = log => {
       const existing = log.entries.find(row => row.id === event.id);
-      if (existing && ['kind', 'note_id', 'at', 'text', 'photo'].some(key => existing[key] !== event[key])) throw new Error('同じ ID の別の追記があります。上書きせず送信を止めました。');
+      if (existing && ['kind', 'note_id', 'at', 'text', 'photo', 'title', 'meta', 'body'].some(key => existing[key] !== event[key])) throw new Error('同じ ID の別の追記があります。上書きせず送信を止めました。');
       return Boolean(existing);
     };
     if (check(await this.readLog(file.id))) return;
